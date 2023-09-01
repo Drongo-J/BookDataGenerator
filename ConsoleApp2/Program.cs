@@ -18,7 +18,7 @@ class Book
     public string Language { get; set; }
     public string Publisher { get; set; }
     public string Year { get; set; }
-    public int Pages { get; set; }
+    public string Pages { get; set; }
     public string CoverUrl { get; set; }
 }
 
@@ -46,7 +46,7 @@ class Program
 
     static async Task Main(string[] args)
     {
-        int numberOfBooks = 500;
+        int numberOfBooks = 1000;
 
         var ids = ConnectNumbers(1, numberOfBooks);
 
@@ -63,7 +63,7 @@ class Program
             try
             {
                 // Build the Libgen API URL with your API key and the number of books.
-                string apiUrl = $"http://libgen.is/json.php?ids={ids}&fields=title,author,year,language,publisher,coverurl";
+                string apiUrl = $"http://libgen.is/json.php?ids={ids}&fields=title,author,year,language,publisher,coverurl, pages";
 
                 // Make the API request.
                 HttpResponseMessage response = await client.GetAsync(apiUrl);
@@ -127,7 +127,7 @@ class Program
                     Console.WriteLine($"Downloaded {book.Title} image");
                     Console.ResetColor();
 
-                    book.Title = "https://media.aykhan.net/assets/images/step-it-academy/react/task13/book-images/" + filename;
+                    book.CoverUrl = "https://media.aykhan.net/assets/images/step-it-academy/react/task13/book-images/" + book.Title.Replace(" ", "_").ToLower() + ".jpg";
                     validBooks.Add(book);
                 }
                 catch (Exception)
@@ -140,9 +140,11 @@ class Program
         }
 
         // Serialize the book list to JSON and save it to a file.
+
         string json = JsonConvert.SerializeObject(validBooks, Newtonsoft.Json.Formatting.Indented);
         File.WriteAllText("~/../../../books.json", json);
 
         Console.WriteLine("Books data saved to 'books.json'");
+        await Console.Out.WriteLineAsync("Book count in JSON file : " + validBooks.Count);
     }
 }
